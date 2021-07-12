@@ -1,6 +1,8 @@
 import pygame
 
 #region pybble
+clock = pygame.time.Clock()
+FPS = 60
 ######################################################
 #
 #  Simple Test - Super simple way to render a tiled map
@@ -71,6 +73,112 @@ class TiledRenderer(object):
     def height(self):
         return self.pixel_size[1]
 
+
+######################################################
+#
+#  Simple Test - Basic app to display a rendered Tiled map
+#
+######################################################
+class SimpleTest(object):
+
+    def __init__(self, filename):
+        self.renderer = None
+        self.layers = {}
+        self.BACKGROUND = 'background'
+        self.BOUNDRY = 'boundries'
+        self.ASTAR = 'astar'
+        self.FOREGROUND = 'foreground'
+        self.GAMEOBJECTS = 'gameobjects'
+        self.load_map(filename)
+
+    def load_map(self, filename):
+        self.renderer = TiledRenderer(filename)
+        self.layers = self.renderer.get_layers()
+
+    def draw(self, surface, delta_x = 0, delta_y = 0):
+        # first we make a temporary surface that will accommodate the entire
+        # size of the map.
+        # because this demo does not implement scrolling, we render the
+        # entire map each frame
+        temp = pygame.Surface(surface.get_size())
+
+        # render the map onto the temporary surface
+        self.renderer.render_map(temp, delta_x, delta_y)
+
+        surface.blit(temp, (0,0))
+
+        # now resize the temporary surface to the size of the display
+        # this will also 'blit' the temp surface to the display
+        #pygame.transform.smoothscale(temp, surface.get_size(), surface)
+
+    def size(self):
+        return self.renderer.size
+
+    def draw_background_layer(self, surface, delta_x, delta_y):
+        self.renderer.render_map_layer(surface, delta_x, delta_y, self.layers[self.BACKGROUND])
+
+    def draw_boundry_layer(self, surface, delta_x, delta_y):
+        self.renderer.render_map_layer(surface, delta_x, delta_y, self.layers[self.BOUNDRY])
+
+    def draw_foreground_layer(self, surface, delta_x, delta_y):
+        self.renderer.render_map_layer(surface, delta_x, delta_y, self.layers[self.FOREGROUND])
+
+    def create_object_layer(self):
+        objects = []
+        return objects
+
+    def create_astar_layer(self):
+        astar_map = []
+        return astar_map
+
+    def get_boundry(self):
+        return self.renderer.get_layer_colliders(self.layers[self.BOUNDRY])
+
+def bind_rect_inside(outer_rect, inner_rect):
+    if inner_rect.left < outer_rect.left:
+        inner_rect.left = outer_rect.left
+    if inner_rect.right > outer_rect.right:
+        inner_rect.right = outer_rect.right
+    if inner_rect.top < outer_rect.top:
+        inner_rect.top = outer_rect.top
+    if inner_rect.bottom > outer_rect.bottom:
+        inner_rect.bottom = outer_rect.bottom
+
+def collision_test(rect, tiles):
+    hit_list = []
+    for tile in tiles:
+        if rect.colliderect(tile):
+            hit_list.append(tile)
+    return hit_list
+
+def move(rect, movement, tiles):
+
+    # dictionary of hits
+    collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
+
+    # collide with x tiles
+    rect.x += movement[0]
+    hit_list = collision_test(rect, tiles)
+    for tile in hit_list:
+        if movement[0] > 0:
+            rect.right = tile.left
+            collision_types['right'] = True
+        if movement[0] < 0:
+            rect.left = tile.right
+            collision_types['left'] = True
+
+    # collide with y tiles
+    rect.y += movement[1]
+    hit_list = collision_test(rect, tiles)
+    for tile in hit_list:
+        if movement[1] > 0:
+            rect.bottom = tile.top
+            collision_types['bottom'] = True
+        if movement[1] < 0:
+            rect.top = tile.bottom
+            collision_types['top'] = True
+
+    return rect, collision_types
 #endregion
 
 #region DaFluffyPotato
@@ -250,7 +358,7 @@ class entity(object):
             self.set_animation_tags(anim[1])
             self.animation_frame = 0
 
-    def get_entity_angle(entity_2):
+    def get_entity_angle(self, entity_2):
         x1 = self.x + int(self.size_x / 2)
         y1 = self.y + int(self.size_y / 2)
         x2 = entity_2.x + int(entity_2.size_x / 2)

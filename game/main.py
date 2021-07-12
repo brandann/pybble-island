@@ -6,66 +6,6 @@ from data import pybble
 
 TESTING = False
 
-######################################################
-#
-#  Simple Test - Basic app to display a rendered Tiled map
-#
-######################################################
-class SimpleTest(object):
-
-    def __init__(self, filename):
-        self.renderer = None
-        self.layers = {}
-        self.BACKGROUND = 'background'
-        self.BOUNDRY = 'boundries'
-        self.ASTAR = 'astar'
-        self.FOREGROUND = 'foreground'
-        self.GAMEOBJECTS = 'gameobjects'
-        self.load_map(filename)
-
-    def load_map(self, filename):
-        self.renderer = pybble.TiledRenderer(filename)
-        self.layers = self.renderer.get_layers()
-
-    def draw(self, surface, delta_x = 0, delta_y = 0):
-        # first we make a temporary surface that will accommodate the entire
-        # size of the map.
-        # because this demo does not implement scrolling, we render the
-        # entire map each frame
-        temp = pygame.Surface(surface.get_size())
-
-        # render the map onto the temporary surface
-        self.renderer.render_map(temp, delta_x, delta_y)
-
-        surface.blit(temp, (0,0))
-
-        # now resize the temporary surface to the size of the display
-        # this will also 'blit' the temp surface to the display
-        #pygame.transform.smoothscale(temp, surface.get_size(), surface)
-
-    def size(self):
-        return self.renderer.size
-
-    def draw_background_layer(self, surface, delta_x, delta_y):
-        self.renderer.render_map_layer(surface, delta_x, delta_y, self.layers[self.BACKGROUND])
-
-    def draw_boundry_layer(self, surface, delta_x, delta_y):
-        self.renderer.render_map_layer(surface, delta_x, delta_y, self.layers[self.BOUNDRY])
-
-    def draw_foreground_layer(self, surface, delta_x, delta_y):
-        self.renderer.render_map_layer(surface, delta_x, delta_y, self.layers[self.FOREGROUND])
-
-    def create_object_layer(self):
-        objects = []
-        return objects
-
-    def create_astar_layer(self):
-        astar_map = []
-        return astar_map
-
-    def get_boundry(self):
-        return self.renderer.get_layer_colliders(self.layers[self.BOUNDRY])
-
 def pygame_events():
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -90,64 +30,11 @@ def pygame_events():
             if event.key == K_DOWN:
                 is_moving['DOWN'] = False
 
-def bind_rect_inside(outer_rect, inner_rect):
-    if inner_rect.left < outer_rect.left:
-        inner_rect.left = outer_rect.left
-    if inner_rect.right > outer_rect.right:
-        inner_rect.right = outer_rect.right
-    if inner_rect.top < outer_rect.top:
-        inner_rect.top = outer_rect.top
-    if inner_rect.bottom > outer_rect.bottom:
-        inner_rect.bottom = outer_rect.bottom
-
-def collision_test(rect, tiles):
-    hit_list = []
-    for tile in tiles:
-        if rect.colliderect(tile):
-            hit_list.append(tile)
-    return hit_list
-
-def move(rect, movement, tiles):
-
-    # dictionary of hits
-    collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
-    is_dirty = False
-
-    # collide with x tiles
-    rect.x += movement[0]
-    hit_list = collision_test(rect, tiles)
-    for tile in hit_list:
-        if movement[X] > 0:
-            rect.right = tile.left
-            collision_types['right'] = True
-        if movement[X] < 0:
-            rect.left = tile.right
-            collision_types['left'] = True
-
-    # collide with y tiles
-    rect.y += movement[1]
-    hit_list = collision_test(rect, tiles)
-    for tile in hit_list:
-        if movement[Y] > 0:
-            rect.bottom = tile.top
-            collision_types['bottom'] = True
-            is_dirty = True
-        if movement[Y] < 0:
-            rect.top = tile.bottom
-            collision_types['top'] = True
-
-    return rect, collision_types
-
-
-
 pygame.init()
 screen = pygame.display.set_mode((600, 600), pygame.RESIZABLE)
 pygame.display.set_caption('PyTMX Map Viewer')
 
-clock = pygame.time.Clock()
-FPS = 60
-
-map = SimpleTest('data/maps/untitled.tmx')
+map = pybble.SimpleTest('data/maps/untitled.tmx')
 
 map_world_rect = pygame.Rect(0, 0, map.renderer.width(), map.renderer.height())
 map_colliders = map.get_boundry()
@@ -168,7 +55,7 @@ time_scale = 1
 
 player_speed = 4/16
 
-delta_time = clock.tick(FPS) * time_scale
+delta_time = pybble.clock.tick(pybble.FPS) * time_scale
 
 while True:
 
@@ -191,7 +78,7 @@ while True:
 
     player_world_rect.x += player_movement[0]
     player_world_rect.y += player_movement[1]
-    #player_world_rect, map_colliders = move(player_world_rect, player_movement, map_colliders)
+    #player_world_rect, map_colliders = pybble.move(player_world_rect, player_movement, map_colliders)
 
     # keep camera the size of screen
     camera_world_rect.width = screen.get_width()
@@ -202,8 +89,8 @@ while True:
     camera_world_rect.top = player_world_rect.top + (player_world_rect.height / 2) - (screen.get_height() / 2)
 
     # square camera to map
-    bind_rect_inside(map_world_rect, camera_world_rect)
-    bind_rect_inside(camera_world_rect, player_world_rect)
+    pybble.bind_rect_inside(map_world_rect, camera_world_rect)
+    pybble.bind_rect_inside(camera_world_rect, player_world_rect)
 
     true_scroll[0] += camera_world_rect.x - true_scroll[0]
     true_scroll[1] += camera_world_rect.y - true_scroll[1]
@@ -242,5 +129,5 @@ while True:
     # draw screen
     pygame.display.flip()
 
-    delta_time = clock.tick(FPS) * time_scale
+    delta_time = pybble.clock.tick(pybble.FPS) * time_scale
 
