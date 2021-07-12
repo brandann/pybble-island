@@ -4,6 +4,7 @@ from data import pybble
 from game import Game
 #from data import pytmx
 
+TESTING = False
 
 ######################################################
 #
@@ -102,8 +103,6 @@ def bind_rect_inside(outer_rect, inner_rect):
 def collision_test(rect, tiles):
     hit_list = []
     for tile in tiles:
-        # if not isinstance(tile, pygame.Rect):
-        #     print('NOT RECT')
         if rect.colliderect(tile):
             hit_list.append(tile)
     return hit_list
@@ -175,9 +174,9 @@ if __name__ == '__main__':
 
     player_speed = 4/16
 
-    while True:
+    delta_time = clock.tick(FPS) * time_scale
 
-        delta_time = clock.tick(FPS) * time_scale
+    while True:
 
         game.update_events()
         game.update_iu()
@@ -202,7 +201,7 @@ if __name__ == '__main__':
 
         player_world_rect.x += player_movement[0]
         player_world_rect.y += player_movement[1]
-        player_world_rect, map_colliders, is_dirty = move(player_world_rect, player_movement, map_colliders)
+        #player_world_rect, map_colliders, is_dirty = move(player_world_rect, player_movement, map_colliders)
 
         # keep camera the size of screen
         camera_world_rect.width = screen.get_width()
@@ -249,12 +248,13 @@ if __name__ == '__main__':
             #draw foreground objects above player
             map.draw_foreground_layer(screen, scroll[0], scroll[1])
 
-            for tile in map_colliders:
-                pygame.draw.rect(screen, (0, 0, 255), tile, 5)
+            if TESTING:
+                for tile in map_colliders:
+                    pygame.draw.rect(screen, (0, 0, 255), tile, 5)
 
             # draw screen
             is_dirty = False
             pygame.display.flip()
 
-        clock.tick(FPS)
+        delta_time = clock.tick(FPS) * time_scale
 
