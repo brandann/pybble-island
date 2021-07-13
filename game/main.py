@@ -76,8 +76,8 @@ while True:
     if is_moving['DOWN']:
         player_movement[1] += player_speed * delta_time
 
-    player_world_rect.x += player_movement[0]
-    player_world_rect.y += player_movement[1]
+    #player_world_rect.x += player_movement[0] # <- this is not needed, the move function does it for us
+    #player_world_rect.y += player_movement[1] # <- this is not needed, the move function does it for us
     player_world_rect, hit_colliders = pybble.move(player_world_rect, player_movement, map_colliders)
 
     # keep camera the size of screen
