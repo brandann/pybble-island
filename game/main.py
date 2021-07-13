@@ -1,8 +1,7 @@
-import pygame, data.pybble, sys
+import pygame, sys
 from pygame.locals import *
 from data import pybble
 #from data import pytmx
-#from game import Game
 
 class Game():
     from data import pybble
