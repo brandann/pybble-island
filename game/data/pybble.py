@@ -144,12 +144,7 @@ def bind_rect_inside(outer_rect, inner_rect):
     if inner_rect.bottom > outer_rect.bottom:
         inner_rect.bottom = outer_rect.bottom
 
-def collision_test(rect, tiles):
-    hit_list = []
-    for tile in tiles:
-        if rect.colliderect(tile):
-            hit_list.append(tile)
-    return hit_list
+
 
 def move(rect, movement, tiles):
 

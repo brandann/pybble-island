@@ -53,7 +53,7 @@ camera_world_rect = pygame.Rect(0, 0, screen.get_width(), screen.get_height())
 
 time_scale = 1
 
-player_speed = 4/16
+player_speed = 3/16
 
 delta_time = pybble.clock.tick(pybble.FPS) * time_scale
 
@@ -78,7 +78,7 @@ while True:
 
     player_world_rect.x += player_movement[0]
     player_world_rect.y += player_movement[1]
-    #player_world_rect, map_colliders = pybble.move(player_world_rect, player_movement, map_colliders)
+    player_world_rect, hit_colliders = pybble.move(player_world_rect, player_movement, map_colliders)
 
     # keep camera the size of screen
     camera_world_rect.width = screen.get_width()
