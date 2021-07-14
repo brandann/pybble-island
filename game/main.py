@@ -11,7 +11,7 @@ class Game():
         self.screen = screen
 
         self.slime = pybble.GameObject(100,100,32,32,'slime')
-        self.slime.load_animation('data/images/slime/bounce.png')
+        self.slime.load_animations('data/images/slime/')
 
         self.map = pybble.SimpleTest('data/maps/untitled.tmx')
         self.map_world_rect = pygame.Rect(0, 0, self.map.renderer.width(), self.map.renderer.height())
@@ -124,8 +124,7 @@ class Game():
         # draw foreground objects above player
         self.map.draw_foreground_layer(self.screen, scroll[0], scroll[1])
 
-        #self.slime_update()
-        self.slime.draw_animation(self.screen, self.true_scroll)
+        self.slime.draw(self.screen, self.true_scroll)
 
         if self.TESTING:
             for tile in self.map_colliders:

@@ -1,4 +1,4 @@
-import pygame
+import pygame, glob
 
 #region pybble
 clock = pygame.time.Clock()
@@ -13,14 +13,21 @@ class GameObject():
         self.type = type
         self.animation = {}
         self.animation_current = ''
+        self.animation_enabled = False
         self.image = None
         self.update = None
         self.sprite_index = 0
         self.animation_frame = 0
         self.ANIMATION_LENGTH = 4
 
+    def draw(self, surface, scroll):
+        if(self.animation_enabled):
+            self.draw_animation(surface, scroll)
+        elif not self.image == None:
+            surface.blit(self.image, [self.x - scroll[0], self.y - scroll[1]])
+
     def draw_animation(self, surface, scroll, inc = 1):
-        surface.blit(self.animation, [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(32 * self.sprite_index, 0, 32, 32))
+        surface.blit(self.animation[self.animation_current], [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(32 * self.sprite_index, 0, 32, 32))
         self.change_frame(inc)
 
     def change_frame(self, i):
@@ -28,11 +35,17 @@ class GameObject():
         if self.animation_frame > self.ANIMATION_LENGTH:
             self.sprite_index += 1
             self.animation_frame = 0
-        if self.sprite_index >= self.animation.get_width() / 32:
+        if self.sprite_index >= self.animation[self.animation_current].get_width() / 32:
             self.sprite_index = 0
 
-    def load_animation(self, path):
-        self.animation = pygame.image.load('data/images/slime/bounce.png')
+    def load_animations(self, path):
+        self.animation_enabled = True
+        for file in glob.glob(path + "*.png"):
+            print(file)
+            name = (file.split('/')[-1]).replace('.png', '')
+            self.animation[name] = pygame.image.load(file)
+            self.animation_current = name
+        #self.animation = pygame.image.load('data/images/slime/bounce.png')
 
 ######################################################
 #
