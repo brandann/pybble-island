@@ -283,8 +283,8 @@ def simple_entity(x, y, e_type):
     return entity(x, y, 1, 1, e_type)
 
 
-def flip(img, boolean=True):
-    return pygame.transform.flip(img, boolean, False)
+# def flip(img, boolean=True):
+#     return pygame.transform.flip(img, boolean, False)
 
 
 def blit_center(surf, surf2, pos):
@@ -428,7 +428,8 @@ class entity(object):
             if self.image != None:
                 image_to_render = flip(self.image, self.flip).copy()
         else:
-            image_to_render = flip(animation_database[self.animation[self.animation_frame]], self.flip).copy()
+            img = animation_database[self.animation[self.animation_frame]]
+            image_to_render = pygame.transform.flip(img, self.flip, False).copy()
         if image_to_render != None:
             center_x = image_to_render.get_width() / 2
             center_y = image_to_render.get_height() / 2
