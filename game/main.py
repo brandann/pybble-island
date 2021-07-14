@@ -126,7 +126,6 @@ class Game():
 
         #self.slime_update()
         self.slime.draw_animation(self.screen, self.true_scroll)
-        self.slime.change_frame(1)
 
         if self.TESTING:
             for tile in self.map_colliders:

@@ -19,8 +19,9 @@ class GameObject():
         self.animation_frame = 0
         self.ANIMATION_LENGTH = 4
 
-    def draw_animation(self, surface, scroll):
+    def draw_animation(self, surface, scroll, inc = 1):
         surface.blit(self.animation, [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(32 * self.sprite_index, 0, 32, 32))
+        self.change_frame(inc)
 
     def change_frame(self, i):
         self.animation_frame += i
