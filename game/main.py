@@ -15,11 +15,13 @@ class Game():
         self.map_colliders = self.map.get_boundry()
         self.true_scroll = [0, 0]
         self.is_moving = {"LEFT": False, "RIGHT": False, "UP": False, "DOWN": False}
+        #self.player = pybble.entity(300,300,25,25,'player')
         self.player_world_rect = pygame.Rect(300 - 12, 300 - 12, 25, 25)
         self.camera_world_rect = pygame.Rect(0, 0, self.screen.get_width(), self.screen.get_height())
         self.time_scale = 1
         self.player_speed = 3 / 16
         self.delta_time = self.get_delta_time()
+        self.frame_tick = 0
 
     def get_delta_time(self):
         return pybble.clock.tick(pybble.FPS) * self.time_scale
@@ -115,8 +117,9 @@ class Game():
         # draw screen
         pygame.display.flip()
 
-    def clean_frame(self):
+    def finalize(self):
         self.delta_time = self.get_delta_time()
+        self.frame_tick += 1 * self.time_scale
         pass # anything to reset before next frame
 
 pygame.init()
@@ -132,5 +135,5 @@ while True:
     game.update_player()
     game.update_game()
     game.update_render()
-    game.clean_frame()
+    game.finalize()
 
