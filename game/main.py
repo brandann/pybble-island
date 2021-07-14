@@ -19,7 +19,10 @@ class Game():
         self.camera_world_rect = pygame.Rect(0, 0, self.screen.get_width(), self.screen.get_height())
         self.time_scale = 1
         self.player_speed = 3 / 16
-        self.delta_time = pybble.clock.tick(pybble.FPS) * self.time_scale
+        self.delta_time = self.get_delta_time()
+
+    def get_delta_time(self):
+        return pybble.clock.tick(pybble.FPS) * self.time_scale
 
     def update_events(self):
         for event in pygame.event.get():
@@ -58,6 +61,7 @@ class Game():
             player_movement[1] -= self.player_speed * self.delta_time
         if self.is_moving['DOWN']:
             player_movement[1] += self.player_speed * self.delta_time
+
 
         # player_world_rect.x += player_movement[0] # <- this is not needed, the move function does it for us
         # player_world_rect.y += player_movement[1] # <- this is not needed, the move function does it for us
@@ -112,7 +116,7 @@ class Game():
         pygame.display.flip()
 
     def clean_frame(self):
-        self.delta_time = pybble.clock.tick(pybble.FPS) * self.time_scale
+        self.delta_time = self.get_delta_time()
         pass # anything to reset before next frame
 
 pygame.init()
