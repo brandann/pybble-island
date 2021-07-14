@@ -3,6 +3,36 @@ import pygame
 #region pybble
 clock = pygame.time.Clock()
 FPS = 60
+
+class GameObject():
+    def __init__(self, x, y, width, height, type):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.type = type
+        self.animation = {}
+        self.animation_current = ''
+        self.image = None
+        self.update = None
+        self.sprite_index = 0
+        self.animation_frame = 0
+        self.ANIMATION_LENGTH = 4
+
+    def draw_animation(self, surface, scroll):
+        surface.blit(self.animation, [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(32 * self.sprite_index, 0, 32, 32))
+
+    def change_frame(self, i):
+        self.animation_frame += i
+        if self.animation_frame > self.ANIMATION_LENGTH:
+            self.sprite_index += 1
+            self.animation_frame = 0
+        if self.sprite_index >= self.animation.get_width() / 32:
+            self.sprite_index = 0
+
+    def load_animation(self, path):
+        self.animation = pygame.image.load('data/images/slime/bounce.png')
+
 ######################################################
 #
 #  Simple Test - Super simple way to render a tiled map
@@ -143,8 +173,6 @@ def bind_rect_inside(outer_rect, inner_rect):
         inner_rect.top = outer_rect.top
     if inner_rect.bottom > outer_rect.bottom:
         inner_rect.bottom = outer_rect.bottom
-
-
 
 def move(rect, movement, tiles):
 
