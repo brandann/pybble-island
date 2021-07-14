@@ -13,6 +13,9 @@ class Game():
         self.slime = pybble.GameObject(100,100,32,32,'slime')
         self.slime.load_animations('data/images/slime/')
 
+        self.idle_guy = pybble.GameObject(200,100,12,32,'player')
+        self.idle_guy.load_animations('data/images/player/')
+
         self.map = pybble.SimpleTest('data/maps/untitled.tmx')
         self.map_world_rect = pygame.Rect(0, 0, self.map.renderer.width(), self.map.renderer.height())
         self.map_colliders = self.map.get_boundry()
@@ -125,6 +128,7 @@ class Game():
         self.map.draw_foreground_layer(self.screen, scroll[0], scroll[1])
 
         self.slime.draw(self.screen, self.true_scroll)
+        self.idle_guy.draw(self.screen, self.true_scroll)
 
         if self.TESTING:
             for tile in self.map_colliders:

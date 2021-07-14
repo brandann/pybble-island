@@ -27,7 +27,7 @@ class GameObject():
             surface.blit(self.image, [self.x - scroll[0], self.y - scroll[1]])
 
     def draw_animation(self, surface, scroll, inc = 1):
-        surface.blit(self.animation[self.animation_current], [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(32 * self.sprite_index, 0, 32, 32))
+        surface.blit(self.animation[self.animation_current], [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(self.width * self.sprite_index, 0, self.width, self.height))
         self.change_frame(inc)
 
     def change_frame(self, i):
