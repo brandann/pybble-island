@@ -19,6 +19,7 @@ class GameObject():
         self.sprite_index = 0
         self.animation_frame = 0
         self.ANIMATION_LENGTH = 4
+        self.flip = False #TODO
 
     def draw(self, surface, scroll):
         if(self.animation_enabled):
@@ -29,6 +30,15 @@ class GameObject():
     def draw_animation(self, surface, scroll, inc = 1):
         surface.blit(self.animation[self.animation_current], [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(self.width * self.sprite_index, 0, self.width, self.height))
         self.change_frame(inc)
+
+    def set_animation(self, ani):
+        if ani == self.animation_current:
+            return
+
+        self.animation_current = ani
+        self.animation_frame = 0
+        self.sprite_index = 0
+        self.animation_enabled = True
 
     def change_frame(self, i):
         self.animation_frame += i
@@ -49,6 +59,8 @@ class GameObject():
             self.animation[name].set_alpha(255) # sets the alpha for the entire image
             self.animation_current = name
 
+    def get_rect(self):
+        return  pygame.Rect(self.x, self.y, self.width, self.height)
 ######################################################
 #
 #  Simple Test - Super simple way to render a tiled map

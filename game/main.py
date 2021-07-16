@@ -20,6 +20,9 @@ class Game():
         idle_guy.load_animations('data/images/player/')
         self.game_object_list.append(idle_guy)
 
+        self.player = pybble.GameObject(300,300,12,32,'player')
+        self.player.load_animations('data/images/player/')
+
         #self.game_object_list.remove(idle_guy)
 
         self.map = pybble.SimpleTest('data/maps/untitled.tmx')
@@ -27,7 +30,7 @@ class Game():
         self.map_colliders = self.map.get_boundry()
         self.true_scroll = [0, 0]
         self.is_moving = {"LEFT": False, "RIGHT": False, "UP": False, "DOWN": False}
-        self.player = pybble.entity(300,300,5,13,'player')
+        #self.player = pybble.entity(300,300,5,13,'player')
         #self.player_world_rect = pygame.Rect(300 - 12, 300 - 12, 25, 25)
         self.camera_world_rect = pygame.Rect(0, 0, self.screen.get_width(), self.screen.get_height())
         self.time_scale = 1
@@ -69,25 +72,25 @@ class Game():
         player_movement = [0, 0]
         if self.is_moving['RIGHT']:
             player_movement[0] += self.player_speed * self.delta_time
-            self.player.set_flip(False)
-            self.player.set_action('run')
+            self.player.flip = False
+            self.player.set_animation('run')
         if self.is_moving['LEFT']:
             player_movement[0] -= self.player_speed * self.delta_time
-            self.player.set_flip(True)
-            self.player.set_action('run')
+            self.player.flip = True
+            self.player.set_animation('run')
         if self.is_moving['UP']:
             player_movement[1] -= self.player_speed * self.delta_time
-            self.player.set_action('run')
+            self.player.set_animation('run')
         if self.is_moving['DOWN']:
             player_movement[1] += self.player_speed * self.delta_time
-            self.player.set_action('run')
+            self.player.set_animation('run')
         if player_movement[0] == 0 and player_movement[1] == 0:
-            self.player.set_action('idle')
+            self.player.set_animation('idle')
 
 
         # player_world_rect.x += player_movement[0] # <- this is not needed, the move function does it for us
         # player_world_rect.y += player_movement[1] # <- this is not needed, the move function does it for us
-        loc, col = pybble.move(self.player.rect(), player_movement, self.map_colliders)
+        loc, col = pybble.move(self.player.get_rect(), player_movement, self.map_colliders)
         self.player.x = loc.x
         self.player.y = loc.y
 
@@ -98,12 +101,12 @@ class Game():
         self.camera_world_rect.height = screen.get_height()
 
         # set camera center to player
-        self.camera_world_rect.left = self.player.rect().left + (self.player.rect().width / 2) - (screen.get_width() / 2)
-        self.camera_world_rect.top = self.player.rect().top + (self.player.rect().height / 2) - (screen.get_height() / 2)
+        self.camera_world_rect.left = self.player.get_rect().left + (self.player.get_rect().width / 2) - (screen.get_width() / 2)
+        self.camera_world_rect.top = self.player.get_rect().top + (self.player.get_rect().height / 2) - (screen.get_height() / 2)
 
         # square camera to map
         pybble.bind_rect_inside(self.map_world_rect, self.camera_world_rect)
-        pybble.bind_rect_inside(self.camera_world_rect, self.player.rect())
+        pybble.bind_rect_inside(self.camera_world_rect, self.player.get_rect())
 
     def update_render(self):
         self.true_scroll[0] += self.camera_world_rect.x - self.true_scroll[0]
@@ -119,7 +122,7 @@ class Game():
         camera_screen_rect.x -= self.true_scroll[0]
         camera_screen_rect.y -= self.true_scroll[1]
 
-        player_screen_rect = self.player.rect().copy()
+        player_screen_rect = self.player.get_rect().copy()
         player_screen_rect.x -= self.true_scroll[0]
         player_screen_rect.y -= self.true_scroll[1]
 
@@ -128,7 +131,7 @@ class Game():
         self.map.draw_boundry_layer(self.screen, scroll[0], scroll[1])
 
         # draw player
-        self.player.display(self.screen, self.true_scroll)
+        self.player.draw_animation(self.screen, self.true_scroll)
 
         # draw foreground objects above player
         self.map.draw_foreground_layer(self.screen, scroll[0], scroll[1])
