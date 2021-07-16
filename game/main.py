@@ -13,7 +13,7 @@ class Game():
         self.game_object_list = []
 
         slime = pybble.GameObject(100,100,32,32,'slime')
-        slime.load_animations('data/images/slime/')
+        slime.load_animations('data/images/slime/', None)
         self.game_object_list.append(slime)
 
         idle_guy = pybble.GameObject(200,100,12,32,'player')
@@ -154,7 +154,7 @@ class Game():
 
 pygame.init()
 screen = pygame.display.set_mode((600, 600), pygame.RESIZABLE)
-pygame.display.set_caption('PyTMX Map Viewer')
+pygame.display.set_caption('Pybble Island - Nybble Studios @rirukiru')
 
 pybble.load_animations('data/images/animations/')
 

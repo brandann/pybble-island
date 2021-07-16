@@ -38,14 +38,16 @@ class GameObject():
         if self.sprite_index >= self.animation[self.animation_current].get_width() / 32:
             self.sprite_index = 0
 
-    def load_animations(self, path):
+    def load_animations(self, path, colorkey = [255,255,255]):
         self.animation_enabled = True
         for file in glob.glob(path + "*.png"):
             print(file)
             name = (file.split('/')[-1]).replace('.png', '')
-            self.animation[name] = pygame.image.load(file)
+            self.animation[name] = pygame.image.load(file).convert()
+            if not colorkey == None:
+                self.animation[name].set_colorkey(colorkey) #sets the key color to be transparent
+            self.animation[name].set_alpha(255) # sets the alpha for the entire image
             self.animation_current = name
-        #self.animation = pygame.image.load('data/images/slime/bounce.png')
 
 ######################################################
 #
