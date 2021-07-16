@@ -83,9 +83,7 @@ class Game():
         if player_movement[0] == 0 and player_movement[1] == 0:
             self.player.set_animation('idle')
 
-        loc, col = pybble.move(self.player.get_rect(), player_movement, self.map_colliders)
-        self.player.x = loc.x
-        self.player.y = loc.y
+        col = self.player.move(player_movement, self.map_colliders)
 
     def update_game(self):
         # keep camera the size of screen

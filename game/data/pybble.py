@@ -61,6 +61,59 @@ class GameObject():
 
     def get_rect(self):
         return  pygame.Rect(self.x, self.y, self.width, self.height)
+
+    def set_rect(self, rect):
+        self.x = rect.x
+        self.y = rect.y
+        self.width = rect.width
+        self.height = rect.height
+
+    # def set_rect(self,x, y, w, h):
+    #     self.x = x
+    #     self.y = y
+    #     self.width = w
+    #     self.height = h
+
+    def move(self, movement, collider_list):
+
+        # dictionary of hits
+        collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
+        rect = self.get_rect()
+
+        # collide with x tiles
+        rect.x += movement[0]
+        hit_list = collision_test(rect, collider_list)
+        for tile in hit_list:
+            if movement[0] > 0:
+                rect.right = tile.left
+                collision_types['right'] = True
+            if movement[0] < 0:
+                rect.left = tile.right
+                collision_types['left'] = True
+
+        # collide with y tiles
+        rect.y += movement[1]
+        hit_list = collision_test(rect, collider_list)
+        for tile in hit_list:
+            if movement[1] > 0:
+                rect.bottom = tile.top
+                collision_types['bottom'] = True
+            if movement[1] < 0:
+                rect.top = tile.bottom
+                collision_types['top'] = True
+
+        self.set_rect(rect)
+        return collision_types
+
+def bind_rect_inside(outer_rect, inner_rect):
+    if inner_rect.left < outer_rect.left:
+        inner_rect.left = outer_rect.left
+    if inner_rect.right > outer_rect.right:
+        inner_rect.right = outer_rect.right
+    if inner_rect.top < outer_rect.top:
+        inner_rect.top = outer_rect.top
+    if inner_rect.bottom > outer_rect.bottom:
+        inner_rect.bottom = outer_rect.bottom
 ######################################################
 #
 #  Simple Test - Super simple way to render a tiled map
@@ -192,44 +245,7 @@ class SimpleTest(object):
     def get_boundry(self):
         return self.renderer.get_layer_colliders(self.layers[self.BOUNDRY])
 
-def bind_rect_inside(outer_rect, inner_rect):
-    if inner_rect.left < outer_rect.left:
-        inner_rect.left = outer_rect.left
-    if inner_rect.right > outer_rect.right:
-        inner_rect.right = outer_rect.right
-    if inner_rect.top < outer_rect.top:
-        inner_rect.top = outer_rect.top
-    if inner_rect.bottom > outer_rect.bottom:
-        inner_rect.bottom = outer_rect.bottom
 
-def move(rect, movement, tiles):
-
-    # dictionary of hits
-    collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
-
-    # collide with x tiles
-    rect.x += movement[0]
-    hit_list = collision_test(rect, tiles)
-    for tile in hit_list:
-        if movement[0] > 0:
-            rect.right = tile.left
-            collision_types['right'] = True
-        if movement[0] < 0:
-            rect.left = tile.right
-            collision_types['left'] = True
-
-    # collide with y tiles
-    rect.y += movement[1]
-    hit_list = collision_test(rect, tiles)
-    for tile in hit_list:
-        if movement[1] > 0:
-            rect.bottom = tile.top
-            collision_types['bottom'] = True
-        if movement[1] < 0:
-            rect.top = tile.bottom
-            collision_types['top'] = True
-
-    return rect, collision_types
 #endregion
 
 #region DaFluffyPotato
