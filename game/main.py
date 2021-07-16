@@ -1,7 +1,6 @@
 import pygame, sys
 from pygame.locals import *
 from data import pybble
-#from data import pytmx
 
 class Game():
     from data import pybble
@@ -19,19 +18,16 @@ class Game():
         idle_guy = pybble.GameObject(200,100,12,32,'player')
         idle_guy.load_animations('data/images/player/')
         self.game_object_list.append(idle_guy)
+        # self.game_object_list.remove(idle_guy)
 
         self.player = pybble.GameObject(300,300,12,32,'player')
         self.player.load_animations('data/images/player/')
-
-        #self.game_object_list.remove(idle_guy)
 
         self.map = pybble.SimpleTest('data/maps/untitled.tmx')
         self.map_world_rect = pygame.Rect(0, 0, self.map.renderer.width(), self.map.renderer.height())
         self.map_colliders = self.map.get_boundry()
         self.true_scroll = [0, 0]
         self.is_moving = {"LEFT": False, "RIGHT": False, "UP": False, "DOWN": False}
-        #self.player = pybble.entity(300,300,5,13,'player')
-        #self.player_world_rect = pygame.Rect(300 - 12, 300 - 12, 25, 25)
         self.camera_world_rect = pygame.Rect(0, 0, self.screen.get_width(), self.screen.get_height())
         self.time_scale = 1
         self.player_speed = 3 / 16
@@ -87,13 +83,9 @@ class Game():
         if player_movement[0] == 0 and player_movement[1] == 0:
             self.player.set_animation('idle')
 
-
-        # player_world_rect.x += player_movement[0] # <- this is not needed, the move function does it for us
-        # player_world_rect.y += player_movement[1] # <- this is not needed, the move function does it for us
         loc, col = pybble.move(self.player.get_rect(), player_movement, self.map_colliders)
         self.player.x = loc.x
         self.player.y = loc.y
-
 
     def update_game(self):
         # keep camera the size of screen
@@ -117,7 +109,6 @@ class Game():
         scroll[0] = int(scroll[0])  # int(scroll[0])
         scroll[1] = int(scroll[1])  # int(scroll[1])
 
-        # player_position = pygame.Rect(player_rect.x - scroll[0], player_rect.y - scroll[1], player_rect.width, player_rect.height)
         camera_screen_rect = self.camera_world_rect.copy()
         camera_screen_rect.x -= self.true_scroll[0]
         camera_screen_rect.y -= self.true_scroll[1]
@@ -136,8 +127,6 @@ class Game():
         # draw foreground objects above player
         self.map.draw_foreground_layer(self.screen, scroll[0], scroll[1])
 
-        # self.slime.draw(self.screen, self.true_scroll)
-        # self.idle_guy.draw(self.screen, self.true_scroll)
         for g in self.game_object_list:
             g.draw(self.screen, self.true_scroll)
 
