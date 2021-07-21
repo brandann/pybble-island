@@ -6,7 +6,7 @@ class Game():
     from data import pybble
     def __init__(self, screen):
 
-        self.TESTING = False
+        self.TESTING = True
         self.screen = screen
 
         self.game_object_list = []
@@ -98,6 +98,9 @@ class Game():
         pybble.bind_rect_inside(self.map_world_rect, self.camera_world_rect)
         pybble.bind_rect_inside(self.camera_world_rect, self.player.get_rect())
 
+        for g in self.game_object_list:
+            self.move_torawrd_player(g, self.player)
+
     def update_render(self):
         self.true_scroll[0] += self.camera_world_rect.x - self.true_scroll[0]
         self.true_scroll[1] += self.camera_world_rect.y - self.true_scroll[1]
@@ -120,7 +123,7 @@ class Game():
         self.map.draw_boundry_layer(self.screen, scroll[0], scroll[1])
 
         # draw player
-        self.player.draw_animation(self.screen, self.true_scroll)
+        self.player.draw(self.screen, self.true_scroll)
 
         # draw foreground objects above player
         self.map.draw_foreground_layer(self.screen, scroll[0], scroll[1])
@@ -130,8 +133,20 @@ class Game():
 
         if self.TESTING:
             for tile in self.map_colliders:
-                pygame.draw.rect(screen, (0, 0, 255), tile, 5)
-            pygame.draw.rect(self.screen, (255, 0, 0), (player_screen_rect), 1)
+                pygame.draw.rect(screen, pybble.Blue, (tile.x-scroll[0], tile.y-scroll[1],tile.width, tile.height), 1)
+            pygame.draw.rect(self.screen, pybble.Red, (player_screen_rect), 1)
+            for g in self.game_object_list:
+                gc = g.get_rect()
+                pygame.draw.rect(screen, pybble.Yellow, (gc.x - scroll[0], gc.y - scroll[1], gc.width, gc.height),1)
+                gwc = g.world_to_screen(scroll).center
+                # pwc = self.player.world_to_screen(scroll).center
+                # pygame.draw.line(self.screen, pybble.Yellow, (gwc[0], gwc[1]), (pwc[0], pwc[1]))
+                p = self.player.get_rect()
+                dist = pybble.Vector_VBetween( ((gc.x, gc.y)) , (p.x, p.y) )
+                g_normal = pybble.Vector_Normalize(dist)
+                g_normal = pybble.Vector_Multiply(g_normal, 100)
+                g_end = pybble.Vector_Add( gwc, (g_normal[0], g_normal[1]))
+                pygame.draw.line(self.screen, pybble.Yellow, gwc, (g_end[0], g_end[1]))
 
         # draw screen
         pygame.display.flip()
@@ -141,6 +156,12 @@ class Game():
         self.frame_tick += 1 * self.time_scale
         self.player.change_frame(1 * self.time_scale)
         pass # anything to reset before next frame
+
+    def move_torawrd_player(self, go, player):
+        go_rect = go.get_rect()
+        pl_rect = player.get_rect()
+        dist = pybble.Vector_Distance((go_rect.x, go_rect.y), (pl_rect.x, pl_rect.y))
+
 
 pygame.init()
 screen = pygame.display.set_mode((600, 600), pygame.RESIZABLE)

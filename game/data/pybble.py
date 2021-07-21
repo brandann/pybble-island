@@ -4,6 +4,31 @@ import pygame, glob
 clock = pygame.time.Clock()
 FPS = 60
 
+Yellow = (255,255,0)
+Red = (255,0,0)
+Blue = (0,0,255)
+
+
+def Vector_Distance(v1, v2):
+    return math.sqrt(  ((v2[0] - v1[0])**2) + ((v2[1] - v1[1])**2) )
+
+def Vector_Magnitude(v):
+    return math.sqrt( (v[0]**2) + (v[1]**2))
+
+def Vector_VBetween(v1, v2):
+    return (v2[0]-v1[0], v2[1]-v1[1])
+
+def Vector_Normalize(v):
+    mag = Vector_Magnitude(v)
+    return ((v[0]/mag), (v[1]/mag))
+
+def Vector_Add(v1, v2):
+    return ( (v1[0] + v2[0]), (v1[1] + v2[1]) )
+
+def Vector_Multiply(v, m):
+    return ( (v[0] * m), (v[1] * m))
+
+
 class GameObject():
     def __init__(self, x, y, width, height, type):
         self.x = x
@@ -25,10 +50,14 @@ class GameObject():
         if(self.animation_enabled):
             self.draw_animation(surface, scroll)
         elif not self.image == None:
-            surface.blit(self.image, [self.x - scroll[0], self.y - scroll[1]])
+            image_to_render = pygame.transform.flip(self.image, self.flip, False).copy()
+            surface.blit(image_to_render, [self.x - scroll[0], self.y - scroll[1]])
+        # image_to_render = pygame.transform.flip(self.animation[self.animation_current], self.flip, False).copy()
+        # surface.blit(image_to_render, [self.x - scroll[0], self.y - scroll[1]])
 
     def draw_animation(self, surface, scroll, inc = 1):
-        surface.blit(self.animation[self.animation_current], [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(self.width * self.sprite_index, 0, self.width, self.height))
+        image_to_render = pygame.transform.flip(self.animation[self.animation_current], self.flip, False).copy()
+        surface.blit(image_to_render, [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(self.width * self.sprite_index, 0, self.width, self.height))
         self.change_frame(inc)
 
     def set_animation(self, ani):
@@ -68,12 +97,6 @@ class GameObject():
         self.width = rect.width
         self.height = rect.height
 
-    # def set_rect(self,x, y, w, h):
-    #     self.x = x
-    #     self.y = y
-    #     self.width = w
-    #     self.height = h
-
     def move(self, movement, collider_list):
 
         # dictionary of hits
@@ -104,6 +127,10 @@ class GameObject():
 
         self.set_rect(rect)
         return collision_types
+
+    def world_to_screen(self, scroll):
+        return pygame.Rect(self.x - scroll[0], self.y - scroll[1], self.width, self.height)
+
 
 def bind_rect_inside(outer_rect, inner_rect):
     if inner_rect.left < outer_rect.left:
