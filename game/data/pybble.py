@@ -8,7 +8,6 @@ Yellow = (255,255,0)
 Red = (255,0,0)
 Blue = (0,0,255)
 
-
 def Vector_Distance(v1, v2):
     return math.sqrt(  ((v2[0] - v1[0])**2) + ((v2[1] - v1[1])**2) )
 
@@ -28,7 +27,6 @@ def Vector_Add(v1, v2):
 def Vector_Multiply(v, m):
     return ( (v[0] * m), (v[1] * m))
 
-
 class GameObject():
     def __init__(self, x, y, width, height, type):
         self.x = x
@@ -36,57 +34,7 @@ class GameObject():
         self.width = width
         self.height = height
         self.type = type
-        self.animation = {}
-        self.animation_current = ''
-        self.animation_enabled = False
-        self.image = None
         self.update = None
-        self.sprite_index = 0
-        self.animation_frame = 0
-        self.ANIMATION_LENGTH = 4
-        self.flip = False #TODO
-
-    def draw(self, surface, scroll):
-        if(self.animation_enabled):
-            self.draw_animation(surface, scroll)
-        elif not self.image == None:
-            image_to_render = pygame.transform.flip(self.image, self.flip, False).copy()
-            surface.blit(image_to_render, [self.x - scroll[0], self.y - scroll[1]])
-        # image_to_render = pygame.transform.flip(self.animation[self.animation_current], self.flip, False).copy()
-        # surface.blit(image_to_render, [self.x - scroll[0], self.y - scroll[1]])
-
-    def draw_animation(self, surface, scroll, inc = 1):
-        image_to_render = pygame.transform.flip(self.animation[self.animation_current], self.flip, False).copy()
-        surface.blit(image_to_render, [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(self.width * self.sprite_index, 0, self.width, self.height))
-        self.change_frame(inc)
-
-    def set_animation(self, ani):
-        if ani == self.animation_current:
-            return
-
-        self.animation_current = ani
-        self.animation_frame = 0
-        self.sprite_index = 0
-        self.animation_enabled = True
-
-    def change_frame(self, i):
-        self.animation_frame += i
-        if self.animation_frame > self.ANIMATION_LENGTH:
-            self.sprite_index += 1
-            self.animation_frame = 0
-        if self.sprite_index >= self.animation[self.animation_current].get_width() / 32:
-            self.sprite_index = 0
-
-    def load_animations(self, path, colorkey = [255,255,255]):
-        self.animation_enabled = True
-        for file in glob.glob(path + "*.png"):
-            print(file)
-            name = (file.split('/')[-1]).replace('.png', '')
-            self.animation[name] = pygame.image.load(file).convert()
-            if not colorkey == None:
-                self.animation[name].set_colorkey(colorkey) #sets the key color to be transparent
-            self.animation[name].set_alpha(255) # sets the alpha for the entire image
-            self.animation_current = name
 
     def get_rect(self):
         return  pygame.Rect(self.x, self.y, self.width, self.height)
@@ -131,6 +79,72 @@ class GameObject():
     def world_to_screen(self, scroll):
         return pygame.Rect(self.x - scroll[0], self.y - scroll[1], self.width, self.height)
 
+class SpriteObject(GameObject):
+    def __init__(self, x, y, width, height, type):
+        super().__init__(x,y,width,height,type)
+        self.animation = {}
+        self.animation_current = ''
+        self.animation_enabled = False
+        self.image = None
+        self.sprite_index = 0
+        self.animation_frame = 0
+        self.ANIMATION_LENGTH = 4
+        self.flip = False  # TODO
+
+    def draw(self, surface, scroll):
+        if(self.animation_enabled):
+            self.draw_animation(surface, scroll)
+        elif not self.image == None:
+            image_to_render = pygame.transform.flip(self.image, self.flip, False).copy()
+            surface.blit(image_to_render, [self.x - scroll[0], self.y - scroll[1]])
+
+    def draw_animation(self, surface, scroll, inc = 1):
+        image_to_render = pygame.transform.flip(self.animation[self.animation_current], self.flip, False).copy()
+        surface.blit(image_to_render, [self.x - scroll[0], self.y - scroll[1]], pygame.Rect(self.width * self.sprite_index, 0, self.width, self.height))
+        self.change_frame(inc)
+
+    def set_animation(self, ani):
+        if ani == self.animation_current:
+            return
+
+        self.animation_current = ani
+        self.animation_frame = 0
+        self.sprite_index = 0
+        self.animation_enabled = True
+
+    def change_frame(self, i):
+        self.animation_frame += i
+        if self.animation_frame > self.ANIMATION_LENGTH:
+            self.sprite_index += 1
+            self.animation_frame = 0
+        if self.sprite_index >= self.animation[self.animation_current].get_width() / 32:
+            self.sprite_index = 0
+
+    def load_animations(self, path, colorkey = [255,255,255]):
+        self.animation_enabled = True
+        for file in glob.glob(path + "*.png"):
+            print(file)
+            name = (file.split('/')[-1]).replace('.png', '')
+            self.animation[name] = pygame.image.load(file).convert()
+            if not colorkey == None:
+                self.animation[name].set_colorkey(colorkey) #sets the key color to be transparent
+            self.animation[name].set_alpha(255) # sets the alpha for the entire image
+            self.animation_current = name
+    def get_frame_image(self):
+        image_to_render = pygame.transform.flip(self.animation[self.animation_current], self.flip, False).copy()
+        surface = pygame.Surface((32,32))
+        surface.blit(image_to_render, [0,0],pygame.Rect(self.width * self.sprite_index, 0, self.width, self.height))
+        return pygame.mask.from_surface(surface)
+
+class CharacterObject(SpriteObject):
+    def __init__(self, x, y, width, height, type):
+        super().__init__(x, y, width, height, type)
+        self.health = -1
+        self.health_max = -1
+
+class NPCObject(SpriteObject):
+    def __init__(self, x, y, width, height, type):
+        super().__init__(x, y, width, height, type)
 
 def bind_rect_inside(outer_rect, inner_rect):
     if inner_rect.left < outer_rect.left:

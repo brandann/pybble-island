@@ -11,16 +11,16 @@ class Game():
 
         self.game_object_list = []
 
-        slime = pybble.GameObject(100,100,32,32,'slime')
+        slime = pybble.SpriteObject(100,100,32,32,'slime')
         slime.load_animations('data/images/slime/', None)
         self.game_object_list.append(slime)
 
-        idle_guy = pybble.GameObject(200,100,12,32,'player')
+        idle_guy = pybble.SpriteObject(200,100,12,32,'player')
         idle_guy.load_animations('data/images/player/')
         self.game_object_list.append(idle_guy)
         # self.game_object_list.remove(idle_guy)
 
-        self.player = pybble.GameObject(300,300,12,32,'player')
+        self.player = pybble.SpriteObject(300,300,12,32,'player')
         self.player.load_animations('data/images/player/')
 
         self.map = pybble.SimpleTest('data/maps/untitled.tmx')
@@ -160,7 +160,16 @@ class Game():
     def move_torawrd_player(self, go, player):
         go_rect = go.get_rect()
         pl_rect = player.get_rect()
-        dist = pybble.Vector_Distance((go_rect.x, go_rect.y), (pl_rect.x, pl_rect.y))
+        dist = pybble.Vector_VBetween((go_rect.x, go_rect.y), (pl_rect.x, pl_rect.y))
+        g_normal = pybble.Vector_Normalize(dist)
+        g_normal = pybble.Vector_Multiply(g_normal, 1)
+        go.x += g_normal[0]
+        go.y += g_normal[1]
+        # pl_mask = player.get_frame_image()
+        # go_mask = go.get_frame_image()
+        # i = pl_mask.overlap(go_mask, (0,0))
+        # if not i == None :
+        #     print(i)
 
 
 pygame.init()
